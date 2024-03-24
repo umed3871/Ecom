@@ -81,6 +81,7 @@ def login(request):
         try:
             if check_password(password, email_id.password):
                 request.session['name'] = email_id.first_name
+                request.session['customer_id'] = email_id.id
                 return redirect ('home')
             else:
                 return HttpResponse("Wrong Password")
@@ -105,20 +106,55 @@ def cart_details(request):
 
     return render(request, 'cart.html', context=context)
 
-def aboutUs(request):
-    return HttpResponse("about us")
 
-def contactUs(request):
-    return HttpResponse("contactus")
-
-def tracker(request):
-    return HttpResponse("tracker")
-
-def search(request):
-    return HttpResponse("search")
-
-def productView(request):
-    return HttpResponse("product")
 
 def checkout(request):
-    return HttpResponse("checkout")
+    if request.method == "POST":
+        address = request.POST.get('address')
+        mobile = request.POST.get('mobile')
+        customer_id = request.session.get('customer_id')
+        if not customer_id:
+            return HttpResponse("Please login")
+
+        cart_id = request.session.get('cart')
+
+        product = Product.objects.filter(id__in = list(cart_id.keys()))
+        
+        for pro in product:
+            order_obj = Order(
+                address = address,
+                mobile = mobile,
+                customer = Registration(id=customer_id),
+                price = pro.product_price,
+                product = pro,
+                quantity = cart_id.get(str(pro.id))
+
+            )
+            order_obj.save()
+        return redirect('order')
+    
+def order_details(request):
+    customer_id = request.session.get('customer_id')
+
+    order = Order.objects.filter(customer=customer_id)
+    tp = 0
+    for i in order:
+        tp = tp + (i.price * i.quantity)
+
+    context = {
+        "order": order,
+        "tp": tp
+    }
+    return render(request, 'order.html', context=context)
+
+
+
+
+from rest_framework import viewsets
+from .serializers import RegistrationSerializer
+
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer

@@ -30,3 +30,19 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+    
+
+class Order(models.Model):
+    address = models.CharField(max_length=150, default='', null=True)
+    mobile = models.BigIntegerField(default=1)
+    customer = models.ForeignKey(Registration, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price = models.IntegerField(default=1)
+    quantity= models.IntegerField(default=1)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.product.product_name
+
+  
+

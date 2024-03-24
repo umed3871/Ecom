@@ -33,3 +33,7 @@ def payable_amount(product,cart):
     for i in product:
         s = s + total_price(i, cart)
     return s
+
+@register.filter(name="order_total_price")
+def order_total_price(price,quantity):
+    return price * quantity

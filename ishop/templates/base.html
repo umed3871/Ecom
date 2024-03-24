@@ -72,6 +72,7 @@
       </div>
       {% if request.session.name %}
       <a href="{% url "logout" %}" class="btn btn-danger mx-2">Logout</a>
+      <a href="{% url "order" %}" class="btn btn-success mx-2">Order</a>
 
       {% else %}
       <button type="button" data-bs-toggle="modal" data-bs-target="#login" class="btn btn-success mx-2">Login</button>
